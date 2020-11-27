@@ -271,7 +271,7 @@ end
 theorem mul_apply {α : Type u} (f g : perm α) (x) : (f * g) x = f (g x) :=
 equiv.trans_apply _ _ _
 
-@[simp] theorem one_apply {α : Type u} (x) : (1 : perm α) x = x := rfl
+theorem one_apply {α : Type u} (x) : (1 : perm α) x = x := rfl
 
 @[simp] lemma inv_apply_self {α : Type u} (f : perm α) (x) :
   f⁻¹ (f x) = x := equiv.symm_apply_apply _ _
@@ -286,6 +286,8 @@ lemma mul_def {α : Type u} (f g : perm α) : f * g = g.trans f := rfl
 lemma inv_def {α : Type u} (f : perm α) : f⁻¹ = f.symm := rfl
 
 @[simp] lemma coe_mul {α : Type u} (f g : perm α) : ⇑(f * g) = f ∘ g := rfl
+
+@[simp] lemma coe_one {α : Type u} : ⇑(1 : perm α) = id := rfl
 
 end perm
 
@@ -1514,6 +1516,14 @@ ext $ λ x, swap_core_swap_core _ _ _
 theorem swap_comp_apply {a b x : α} (π : perm α) :
   π.trans (swap a b) x = if π x = a then b else if π x = b then a else π x :=
 by { cases π, refl }
+
+lemma swap_eq_update (i j : α) :
+  ⇑(equiv.swap i j) = update (update id j i) i j :=
+funext $ λ x, by rw [update_apply _ i j, update_apply _ j i, equiv.swap_apply_def, id.def]
+
+lemma comp_swap_eq_update {β : Type*} (i j : α) (f : α → β) :
+  f ∘ equiv.swap i j = update (update f j (f i)) i (f j) :=
+by rw [swap_eq_update, comp_update, comp_update, comp.right_id]
 
 @[simp] lemma swap_inv {α : Type*} [decidable_eq α] (x y : α) :
   (swap x y)⁻¹ = swap x y := rfl
