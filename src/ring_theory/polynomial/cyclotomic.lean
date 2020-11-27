@@ -7,7 +7,7 @@ Author: Riccardo Brasca
 import field_theory.splitting_field
 import ring_theory.roots_of_unity
 import algebra.polynomial.big_operators
-import number_theory.divisors
+import number_theory.arithmetic_function
 import data.polynomial.lifts
 import analysis.complex.roots_of_unity
 
@@ -29,7 +29,7 @@ with coefficients in any ring `R`.
 * `int_coeff_of_cycl` : If there is a primitive `n`-th root of unity in `K`, then `cyclotomic' n K`
 comes from a polynomial with integer coefficients.
 * `deg_of_cyclotomic` : The degree of `cyclotomic n` is `totient n`.
-* `X_pow_sub_one_eq_prod_cycl` : `X ^ n - 1 = ∏ (cyclotomic i)`, where `i` divides `n`.
+* `prod_cyclotomic_eq_X_pow_sub_one` : `X ^ n - 1 = ∏ (cyclotomic i)`, where `i` divides `n`.
 
 ## Implementation details
 
@@ -406,6 +406,15 @@ begin
     exact (map_cyclotomic_int i R).symm },
   rw [finset.prod_congr (refl n.divisors) h, coerc, ←map_prod (int.cast_ring_hom R)
   (λ i, cyclotomic i ℤ), integer]
+end
+
+open nat.arithmetic_function
+
+lemma cyclotomic_eq_prod_X_pow_sub_one_pow_moebius {F : Type*} [field F]
+  {ζ : R} {n : ℕ} (hpos : 0 < n) (h : is_primitive_root ζ n) (f : polynomial R → F) :
+  f (cyclotomic' n K) = ∏ i in nat.divisors n, (f (X ^ i - 1)) ^ moebius i :=
+begin
+  rw ← prod_eq_iff_prod_moebius_eq,
 end
 
 /-- We have
