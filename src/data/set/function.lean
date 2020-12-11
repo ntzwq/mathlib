@@ -655,6 +655,10 @@ lemma strict_mono.cod_restrict [preorder α] [preorder β] {f : α → β} (hf :
   strict_mono (set.cod_restrict f s hs) :=
 hf
 
+lemma strict_mono_restrict_iff [preorder α] [preorder β] {f : α → β} {s : set α} :
+  strict_mono (s.restrict f) ↔ strict_mono_incr_on f s :=
+by simp only [strict_mono, strict_mono_incr_on, set_coe.forall', set.restrict, subtype.coe_lt_coe]
+
 namespace function
 
 open set

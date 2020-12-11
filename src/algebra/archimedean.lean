@@ -319,3 +319,43 @@ have ((x + (1 : ℚ) / (2 : ℚ) : ℚ) : α) = x + 1 / 2, by simp,
 by rw [round, round, ← this, rat.cast_floor]
 
 end
+variables [archimedean α]
+variables {l : filter β} {f : β → α}
+
+/-- If a function tends to infinity along a filter, then this function multiplied by a positive
+constant (on the left) also tends to infinity. The archimedean assumption is convenient to get a
+statement that works on `ℕ`, `ℤ` and `ℝ`, although not necessary (a version in ordered fields is
+given in `tendsto_at_top_mul_left'`). -/
+lemma tendsto_at_top_mul_left  {r : α} (hr : 0 < r) (hf : tendsto f l at_top) :
+  tendsto (λx, r * f x) l at_top :=
+let ⟨n, hn⟩ := archimedean.arch
+/-begin
+  apply tendsto_at_top.2 (λb, _),
+  obtain ⟨n : ℕ, hn : 1 ≤ n •ℕ r⟩ := archimedean.arch 1 hr,
+  have hn' : 1 ≤ r * n, by rwa nsmul_eq_mul' at hn,
+  filter_upwards [tendsto_at_top.1 hf (n * max b 0)],
+  assume x hx,
+  calc b ≤ 1 * max b 0 : by { rw [one_mul], exact le_max_left _ _ }
+  ... ≤ (r * n) * max b 0 : mul_le_mul_of_nonneg_right hn' (le_max_right _ _)
+  ... = r * (n * max b 0) : by rw [mul_assoc]
+  ... ≤ r * f x : mul_le_mul_of_nonneg_left hx (le_of_lt hr)
+end-/
+
+/-- If a function tends to infinity along a filter, then this function multiplied by a positive
+constant (on the right) also tends to infinity. The archimedean assumption is convenient to get a
+statement that works on `ℕ`, `ℤ` and `ℝ`, although not necessary (a version in ordered fields is
+given in `tendsto_at_top_mul_right'`). -/
+lemma tendsto_at_top_mul_right {r : α} (hr : 0 < r) (hf : tendsto f l at_top) :
+  tendsto (λx, f x * r) l at_top :=
+begin
+  apply tendsto_at_top.2 (λb, _),
+  obtain ⟨n : ℕ, hn : 1 ≤ n •ℕ r⟩ := archimedean.arch 1 hr,
+  have hn' : 1 ≤ (n : α) * r, by rwa nsmul_eq_mul at hn,
+  filter_upwards [tendsto_at_top.1 hf (max b 0 * n)],
+  assume x hx,
+  calc b ≤ max b 0 * 1 : by { rw [mul_one], exact le_max_left _ _ }
+  ... ≤ max b 0 * (n * r) : mul_le_mul_of_nonneg_left hn' (le_max_right _ _)
+  ... = (max b 0 * n) * r : by rw [mul_assoc]
+  ... ≤ f x * r : mul_le_mul_of_nonneg_right hx (le_of_lt hr)
+end
+
